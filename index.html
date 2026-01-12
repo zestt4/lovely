@@ -273,8 +273,17 @@ function checkBirthday(){
     const date = document.getElementById('date').value;
     if(!date) return;
      const music = document.getElementById('bgMusic');
-    music.volume = 0.5;
-    music.play().catch(()=>{});
+    music.volume = 0.6;
+    music.play().catch(err => {
+        console.log("iOS blocked autoplay:", err);
+    });
+    music.volume = 0;
+let v = 0;
+const fade = setInterval(() => {
+    v += 0.02;
+    music.volume = Math.min(v, 0.6);
+    if (v >= 0.6) clearInterval(fade);
+}, 100);
     const today = new Date();
     const bd = new Date(date);
     const prompt = document.getElementById('birthdayPrompt');
@@ -308,4 +317,5 @@ resize();
 </script>
 </body>
 </html>
+
 
