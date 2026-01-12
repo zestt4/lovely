@@ -57,9 +57,7 @@
 
 </style>
 </head>
-<audio id="bgMusic" preload="auto" loop playsinline>
-    <source src="C:\Users\Thinkpad\lovely\Arcade Fire with Owen Pallett - Dimensions (Official Audio).mp3" type="audio/mpeg">
-</audio>
+
 
 <body>
 
@@ -96,9 +94,7 @@ const ctxPetals = cPetals.getContext('2d');
 let w = window.innerWidth, h = window.innerHeight;
 let fallingPetals = [];
 let stars = [];
-const music = document.getElementById('bgMusic');
-music.volume = 0.5;
-music.play().catch(()=>{});
+
 
 
 function resize() {
@@ -265,22 +261,22 @@ function closePrompt(){
 }
 
 function startExperience() {
-
     const music = document.getElementById("bgMusic");
 
-    // iOS requires this to be FIRST
+    // iOS-approved gesture start
     music.muted = false;
     music.volume = 0.6;
 
-    music.play()
-        .then(() => {
-            console.log("Music started ✅");
-        })
-        .catch(err => {
-            alert("Tap once more to start music 🌸");
-            console.log(err);
-            return;
-        });
+    music.play().then(() => {
+        console.log("Music started 🌙");
+    }).catch(err => {
+        alert("Tap once more 🌸");
+        return;
+    });
+
+    checkBirthdayLogic();
+}
+
 
     // AFTER audio starts, continue
     checkBirthdayLogic();
@@ -293,9 +289,7 @@ function checkBirthdayLogic(){
     
     const date = document.getElementById('date').value;
     if(!date) return;
-     const music = document.getElementById('bgMusic');
-    music.volume = 0.6;
-    music.play().catch(err => {
+    
         console.log("iOS blocked autoplay:", err);
     });
     music.volume = 0;
@@ -336,8 +330,13 @@ resize();
 
 
 </script>
+    <audio id="bgMusic" preload="auto" loop playsinline>
+    <source src="C:\Users\Thinkpad\lovely\Arcade Fire with Owen Pallett - Dimensions (Official Audio).mp3" type="audio/mpeg">
+</audio>
+
 </body>
 </html>
+
 
 
 
