@@ -57,7 +57,7 @@
 
 </style>
 </head>
-<audio id="bgMusic" loop>
+<audio id="bgMusic" preload="auto" loop playsinline>
     <source src="C:\Users\Thinkpad\lovely\Arcade Fire with Owen Pallett - Dimensions (Official Audio).mp3" type="audio/mpeg">
 </audio>
 
@@ -264,11 +264,32 @@ function closePrompt(){
     }, 1200);
 }
 
+function startExperience() {
+
+    const music = document.getElementById("bgMusic");
+
+    // iOS requires this to be FIRST
+    music.muted = false;
+    music.volume = 0.6;
+
+    music.play()
+        .then(() => {
+            console.log("Music started ✅");
+        })
+        .catch(err => {
+            alert("Tap once more to start music 🌸");
+            console.log(err);
+            return;
+        });
+
+    // AFTER audio starts, continue
+    checkBirthdayLogic();
+}
 
 // =========================
 // BIRTHDAY PROMPT
 // =========================
-function checkBirthday(){
+function checkBirthdayLogic(){
     
     const date = document.getElementById('date').value;
     if(!date) return;
@@ -317,5 +338,6 @@ resize();
 </script>
 </body>
 </html>
+
 
 
