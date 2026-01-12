@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sakura Birthday 🌸</title>
+<title>Happy Birthday 🌸</title>
 <style>
     body { margin: 0; overflow: hidden; background: #000; font-family: 'Georgia', serif;}
     canvas { position: absolute; top: 0; left: 0; }
@@ -70,7 +70,7 @@
 
     <input type="date" id="date"><br>
 
-    <button onclick="checkBirthday()">Reveal ✨</button>
+    <button onclick="startExperience()">Reveal ✨</button>
 </div>
 
 
@@ -240,6 +240,28 @@ function animate(){
     }
     requestAnimationFrame(animate);
 }
+function startExperience() {
+
+    const music = document.getElementById("bgMusic");
+
+    // iOS requires this to be FIRST
+    music.muted = false;
+    music.volume = 0.6;
+
+    music.play()
+        .then(() => {
+            console.log("Music started ✅");
+        })
+        .catch(err => {
+            alert("Tap once more to start music 🌸");
+            console.log(err);
+            return;
+        });
+
+    // AFTER audio starts, continue
+    checkBirthdayLogic();
+}
+
 function closePrompt(){
     const prompt = document.getElementById('birthdayPrompt');
     const music = document.getElementById('bgMusic');
@@ -260,27 +282,6 @@ function closePrompt(){
     }, 1200);
 }
 
-function startExperience() {
-    const music = document.getElementById("bgMusic");
-
-    // iOS-approved gesture start
-    music.muted = false;
-    music.volume = 0.6;
-
-    music.play().then(() => {
-        console.log("Music started 🌙");
-    }).catch(err => {
-        alert("Tap once more 🌸");
-        return;
-    });
-
-    checkBirthdayLogic();
-}
-
-
-    // AFTER audio starts, continue
-    checkBirthdayLogic();
-}
 
 // =========================
 // BIRTHDAY PROMPT
@@ -289,7 +290,9 @@ function checkBirthdayLogic(){
     
     const date = document.getElementById('date').value;
     if(!date) return;
-    
+     const music = document.getElementById('bgMusic');
+    music.volume = 0.6;
+    music.play().catch(err => {
         console.log("iOS blocked autoplay:", err);
     });
     music.volume = 0;
@@ -330,13 +333,8 @@ resize();
 
 
 </script>
-    <audio id="bgMusic" preload="auto" loop playsinline>
+<audio id="bgMusic" loop>
     <source src="C:\Users\Thinkpad\lovely\Arcade Fire with Owen Pallett - Dimensions (Official Audio).mp3" type="audio/mpeg">
 </audio>
-
 </body>
 </html>
-
-
-
-
