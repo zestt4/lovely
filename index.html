@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sakura Birthday 🌸</title>
+<style>
+    body { margin: 0; overflow: hidden; background: #000; font-family: 'Georgia', serif;}
+    canvas { position: absolute; top: 0; left: 0; }
+    #bgLayer { z-index: 1; }
+    #treeLayer { z-index: 2; }
+    #petalLayer { z-index: 3; pointer-events: none; }
+   #message {
+    position: absolute;
+    top: 18%;
+    width: 100%;
+    text-align: center;
+    color: #ffd6e3;
+    font-style: italic;
+    font-size: 1.4rem;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 3s;
+    text-shadow:
+        0 0 8px rgba(255,182,193,0.6),
+        0 0 16px rgba(255,182,193,0.4);
+}
+
+    #birthdayPrompt {
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.7);
+        padding: 40px 30px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        color: #fff;
+        z-index: 5;
+    }
+    #birthdayPrompt input { width:80%; padding:10px; margin:5px 0; border-radius:10px; border:1px solid #555; background:#222; color:#fff; font-size:15px;}
+    #birthdayPrompt button {
+        padding:10px 25px; border-radius:20px; border:none;
+        background: linear-gradient(135deg,#6a5af9,#9b83f7); color:white; cursor:pointer;
+        font-size:15px;
+    }
+
+    #signature {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: rgba(214, 92, 122, 0.7);
+    letter-spacing: 0.5px;
+}
+
+
+</style>
+</head>
+<audio id="bgMusic" loop>
+    <source src="C:\Users\Thinkpad\Arcade Fire with Owen Pallett - Dimensions (Official Audio).mp3" type="audio/mpeg">
+</audio>
+
+<body>
+
+<div id="birthdayPrompt">
+    <h2>🌙 A quiet question</h2>
+    <p>
+        Before the night blooms…<br>
+        Suvda tell me when you were born.
+    </p>
+
+    <input type="date" id="date"><br>
+
+    <button onclick="checkBirthday()">Reveal ✨</button>
+</div>
+
+
+<canvas id="bgLayer"></canvas>
+<canvas id="treeLayer"></canvas>
+<canvas id="petalLayer"></canvas>
+<div id="message">
+    Төрсөн өдрийн мэнд! —  Энэ насандаа Од шиг гялалзаарай цэцэг шиг дэлгэрээрэй.<br>
+    <span id="signature">— from who cares</span>
+</div>
+
+
+<script>
+const cBg = document.getElementById('bgLayer');
+const ctxBg = cBg.getContext('2d');
+const cTree = document.getElementById('treeLayer');
+const ctxTree = cTree.getContext('2d');
+const cPetals = document.getElementById('petalLayer');
+const ctxPetals = cPetals.getContext('2d');
+
+let w = window.innerWidth, h = window.innerHeight;
+let fallingPetals = [];
+let stars = [];
+const music = document.getElementById('bgMusic');
+music.volume = 0.5;
+music.play().catch(()=>{});
+
+
+function resize() {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    cBg.width = cTree.width = cPetals.width = w;
+    cBg.height = cTree.height = cPetals.height = h;
+    generateStars();
+}
+window.addEventListener('resize', resize);
+
+// =========================
+// NIGHT SKY + TWINKLING STARS
+// =========================
+function generateStars(){
+    stars = [];
+    for(let i=0;i<500;i++){
+        stars.push({
+            x: Math.random()*w,
+            y: Math.random()*h*0.7,
+            r: Math.random()*1.5+0.5,
+            opacity: Math.random(),
+            speed: Math.random()*0.02+0.005  // twinkle speed
+        });
+    }
+}
+
+function drawStars(){
+    for(let s of stars){
+        s.opacity += s.speed;
+        if(s.opacity>1) { s.opacity=1; s.speed*=-1; }
+        if(s.opacity<0) { s.opacity=0; s.speed*=-1; }
+        ctxBg.beginPath();
+        ctxBg.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctxBg.fillStyle = `rgba(255,255,255,${s.opacity})`;
+        ctxBg.fill();
+    }
+}
+
+// =========================
+// BACKGROUND + GRASS
+// =========================
+function drawBackground(){
+    // Night sky
+    const grad = ctxBg.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,"#000012");
+    grad.addColorStop(1,"#0d0d1a");
+    ctxBg.fillStyle = grad;
+    ctxBg.fillRect(0,0,w,h);
+
+    drawStars();
+
+    // Ground gradient
+    const grd = ctxBg.createLinearGradient(0,h*0.85,0,h);
+    grd.addColorStop(0,"#142d12");
+    grd.addColorStop(1,"#1e3b18");
+    ctxBg.fillStyle = grd;
+    ctxBg.fillRect(0,h*0.85,w,h*0.15);
+
+    // Grass silhouette
+    for(let i=0;i<500;i++){
+        let x = Math.random()*w;
+        let y = h*0.85 + Math.random()*h*0.15;
+        let grassH = 10 + Math.random()*15;
+        ctxBg.beginPath();
+        ctxBg.strokeStyle = Math.random()>0.5?"#2a5c2a":"#1f4d1f";
+        ctxBg.lineWidth = 1.2;
+        ctxBg.moveTo(x,y);
+        ctxBg.quadraticCurveTo(x+2,y-grassH/2,x+(Math.random()-0.5)*6,y-grassH);
+        ctxBg.stroke();
+    }
+}
+
+// =========================
+// TREE & PETALS
+// =========================
+const maxDepth = 10;
+const branchColor = "#4e3629";
+const bloomColor = "rgba(255, 183, 197, 0.7)";
+
+function startTree() {
+    drawBranch(w/2, h*0.9, 120, -Math.PI/2, 18, 0);
+}
+
+function drawBranch(x,y,len,angle,width,depth){
+    const endX = x + len*Math.cos(angle);
+    const endY = y + len*Math.sin(angle);
+    ctxTree.beginPath();
+    ctxTree.moveTo(x,y);
+    ctxTree.lineTo(endX,endY);
+    ctxTree.lineWidth = width;
+    ctxTree.lineCap="round";
+    ctxTree.strokeStyle = branchColor;
+    ctxTree.stroke();
+    if(depth>=maxDepth || width<2){
+        drawBlossomCluster(endX,endY);
+        return;
+    }
+    setTimeout(()=>{
+        const subLen = len*0.75;
+        const subWidth = width*0.7;
+        drawBranch(endX,endY,subLen,angle+0.25+Math.random()*0.2,subWidth,depth+1);
+        drawBranch(endX,endY,subLen,angle-0.25-Math.random()*0.2,subWidth,depth+1);
+        if(Math.random()<0.3) drawBranch(endX,endY,subLen,angle+(Math.random()*0.1-0.05),subWidth,depth+1);
+    }, 120);
+}
+
+function drawBlossomCluster(x,y){
+    const cnt = 7+Math.random()*10;
+    for(let i=0;i<cnt;i++){
+        ctxTree.beginPath();
+        let r=3+Math.random()*4;
+        let offsetX=(Math.random()-0.5)*25;
+        let offsetY=(Math.random()-0.5)*25;
+        ctxTree.arc(x+offsetX,y+offsetY,r,0,Math.PI*2);
+        ctxTree.fillStyle=bloomColor;
+        ctxTree.fill();
+        if(Math.random()>0.4){
+            fallingPetals.push({x:x+offsetX,y:y+offsetY,vx:(Math.random()-0.5)*2,vy:1+Math.random(),s:3+Math.random()*3});
+        }
+    }
+}
+
+// =========================
+// FALLING PETALS
+// =========================
+function animate(){
+    ctxPetals.clearRect(0,0,w,h);
+    drawBackground();
+    for(let i=0;i<fallingPetals.length;i++){
+        let p = fallingPetals[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.x += Math.sin(p.y*0.05)*0.5;
+        ctxPetals.beginPath();
+        ctxPetals.arc(p.x,p.y,p.s,0,Math.PI*2);
+        ctxPetals.fillStyle="#ffc0cb";
+        ctxPetals.fill();
+        if(p.y>h){
+            fallingPetals.splice(i,1);
+            i--;
+        }
+    }
+    requestAnimationFrame(animate);
+}
+function closePrompt(){
+    const prompt = document.getElementById('birthdayPrompt');
+    const music = document.getElementById('bgMusic');
+
+    prompt.style.transition = "opacity 1.2s";
+    prompt.style.opacity = "0";
+    prompt.style.pointerEvents = "none";
+
+    // Start music (user gesture = mobile-safe)
+    music.volume = 0.5;
+    music.play().catch(()=>{});
+
+    setTimeout(() => {
+        prompt.style.display = "none";
+        startTree();
+        animate();
+        document.getElementById('message').style.opacity = 1;
+    }, 1200);
+}
+
+
+// =========================
+// BIRTHDAY PROMPT
+// =========================
+function checkBirthday(){
+    
+    const date = document.getElementById('date').value;
+    if(!date) return;
+     const music = document.getElementById('bgMusic');
+    music.volume = 0.5;
+    music.play().catch(()=>{});
+    const today = new Date();
+    const bd = new Date(date);
+    const prompt = document.getElementById('birthdayPrompt');
+
+ if(today.getDate()===bd.getDate() && today.getMonth()===bd.getMonth()){
+    prompt.innerHTML = `
+        <h2>🌸 It’s today</h2>
+        <p>
+            Төрсөн өдрийн мэнд!<br>
+            Энэ насандаа Од шиг гялалзаарай цэцэг шиг дэлгэрээрэй.
+        </p>
+        <button onclick="closePrompt()">Begin 🌙</button>
+    `;
+        const msg = document.getElementById('message');
+        msg.style.opacity = 1;
+        setTimeout(()=>{
+            prompt.style.display='none';
+            startTree();
+            animate();
+        },2000);
+    } else {
+        prompt.innerHTML = `<h2>Not yet 🌱</h2>
+                            <p>But spring feels near, ${name}.</p>`;
+    }
+}
+
+// INITIAL DRAW
+resize();
+
+
+</script>
+</body>
+</html>
